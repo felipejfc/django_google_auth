@@ -17,7 +17,16 @@ class GoogleAuthBackend(object):
     """
 
     def authenticate(self, request, token=None):
-        return None
+        r = requests.get('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={}'.format(token))
+        if r.status_code != 200:
+            return None
+        acc_info = r.json()
+        email = acc_info.get('email','')
+        user = get_users_by_email(email)
+        if len(user) <= 0:
+            return None
+        else:
+            return user[0]
 
     def get_user(self, user_id):
         try:
@@ -44,7 +53,7 @@ class GoogleAuthAuthentication(BaseAuthentication):
         if r.status_code != 200:
             return None
         acc_info = r.json()
-        email = acc_info['email']
+        email = acc_info.get('email','')
         user = get_users_by_email(email)
         if len(user) <= 0:
             return None

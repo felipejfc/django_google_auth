@@ -5,6 +5,6 @@ from django.conf.urls import url, include
 from .views import GoogleAuthCodeURL, ExchangeCode
 
 urlpatterns = [
-    url(r'^codeUrl/?$', GoogleAuthCodeURL.as_view(), name="codeurl"),
-    url(r'^complete/?$', ExchangeCode.as_view(), name="complete"),
+    url(r'^code_url/?$', GoogleAuthCodeURL.as_view(), name="codeurl"),
+    url(r'^authenticate/?$', ExchangeCode.as_view(), name="authenticate"),
 ]

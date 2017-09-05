@@ -19,7 +19,11 @@ setup(
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    install_requires=[],
+    install_requires=[
+        'oauth2client>=4.1.2',
+        'requests>=2.18.4',
+        'djangorestframework>=3.0.1',
+        ],
     include_package_data=True,
     zip_safe=False,
 )

@@ -19,7 +19,9 @@ redirect_uri = getattr(settings, 'GOOGLE_AUTH_REDIRECT_URL', 'localhost:8000')
 flow = OAuth2WebServerFlow(client_id=client_id,
                            client_secret=client_secret,
                            scope=scope,
-                           redirect_uri=redirect_uri)
+                           redirect_uri=redirect_uri,
+                           prompt='consent',
+                           access_type='offline')
 
 class GoogleAuthCodeURL(View):
     def get(self, request):
@@ -44,9 +46,7 @@ class ExchangeCode(View):
         user, _ = create_user(name, last_name, email)
         google_auth_user, _ = create_google_auth_user(user, email, access_token, refresh_token, token_expiry)
         res = {}
-        res['access_token'] = access_token
-        res['refresh_token'] = refresh_token
-        res['token_expiry'] = token_expiry.isoformat()
+        res['token'] = google_auth_user.app_token
         res['email'] = email
         return HttpResponse(json.dumps(res))
     head = post

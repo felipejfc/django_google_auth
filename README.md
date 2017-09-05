@@ -2,7 +2,7 @@ django-google-auth
 ==================
 
 A google auth authenticator backend for django and django rest framework.
-This backend will always validate all requests against google, so that when a user has it's email removed from the domain, it will lose access.
+This backend will validate the user's access token against google in every request, so that when a user has it's email removed from the domain for example, it will lose access instantly.
 
 ### Installation
 ```
@@ -48,7 +48,7 @@ the redirect url after google authorization, must change it to some endpoint tha
 
 all of them must be set.
 
-### Flow to get authentication and refresh token
+### Flow to authenticate
 e.g. (assuming that urls are mounted as in the example above)
 ```
 $ curl localhost:8000/auth/code_url
@@ -59,19 +59,19 @@ e.g.
 ```
 GOOGLE_AUTH_REDIRECT_URL/?code=xxxxxxxxx#
 ```
-Code should then be exchanged by an access token and refresh token (this will also create a Django User)
+Code should then be exchanged by an app token (this will also create a Django User and register google auth and refresh token in the database for further use authenticating every request against google)
 ```
 curl -X POST "localhost:5000/google_auth/authenticate/?code=xxxxxxxxx"
-{"access_token": "ya29.xxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxx-xxxxxxxxxxxxxxx", "refresh_token": xxxxxxxxxxxxx, "token_expiry": "2017-09-05T21:46:33.809210", "email": "me@felipejfc.com"}
+{"token": "xxxxxxxxx-xxxxxxxxxxxxxx-xxxxxxxxxxxxxxx", "email": "me@felipejfc.com"}
 ```
 
 ### Authenticating requests
 After completing the above flow, to authenticate an user's request, set an Authorization header
 ```
-Authorization: token ya29.xxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Authorization: token xxxxxxxxxx-xxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxx
 ```
 
-### Rest Framework
+##### Rest Framework
 For django rest framework, add google_auth.authentication.GoogleAuthAuthentication to REST_FRAMEWORK.DEFAULT_AUTHENTICATOR_CLASSES
 ```
     'DEFAULT_AUTHENTICATION_CLASSES': (

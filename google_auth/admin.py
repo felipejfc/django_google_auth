@@ -5,7 +5,7 @@ from .models import GoogleAuthUser
 
 class GoogleAuthUserOption(admin.ModelAdmin):
     """GoogleAuthUser options"""
-    list_display = ('email','access_token','refresh_token','token_expiry')
+    list_display = ('email','app_token','access_token','refresh_token','token_expiry')
     search_fields = ('email',)
 
 admin.site.register(GoogleAuthUser, GoogleAuthUserOption)

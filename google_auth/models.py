@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import uuid
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -14,12 +15,16 @@ USER_MODEL = getattr(settings, 'USER_MODEL', None) or \
 class GoogleAuthUser(models.Model):
     user = models.ForeignKey(to=USER_MODEL, related_name='google_auth_user', on_delete=models.CASCADE)
     email = models.EmailField(max_length=EMAIL_LENGTH, unique=True)
+    app_token = models.CharField(max_length=254, blank=True, unique=True, default=uuid.uuid4)
     token_expiry = models.DateTimeField(null=True)
     access_token = models.CharField(max_length=254,null=True)
     refresh_token = models.CharField(max_length=254,null=True)
 
+def get_google_auth_user_by_app_token(app_token):
+    return GoogleAuthUser.objects.filter(**{"app_token": app_token}).first()
+
 def get_users_by_email(email):
-    return User.objects.filter(**{"email__iexact": email}) 
+    return User.objects.filter(**{"email__iexact": email}).first()
 
 def create_user(name, last_name, email):
     return get_user_model().objects.update_or_create(

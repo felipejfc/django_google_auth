@@ -7,6 +7,8 @@ from rest_framework import exceptions, authentication, HTTP_HEADER_ENCODING
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
 from .models import get_users_by_email
 
+token_verification_url = 'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={}'
+
 class GoogleAuthBackend(object):
     """
     Authenticate all requests against google, so that when the access token is revoked, the user will lose access immediately.
@@ -17,7 +19,7 @@ class GoogleAuthBackend(object):
     """
 
     def authenticate(self, request, token=None):
-        r = requests.get('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={}'.format(token))
+        r = requests.get(token_verification_url.format(token))
         if r.status_code != 200:
             return None
         acc_info = r.json()
@@ -49,7 +51,7 @@ class GoogleAuthAuthentication(BaseAuthentication):
             msg = 'Invalid authorization header.'
             raise exceptions.AuthenticationFailed(msg)
         token = auth[1]
-        r = requests.get('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={}'.format(token))
+        r = requests.get(token_verification_url.format(token))
         if r.status_code != 200:
             return None
         acc_info = r.json()

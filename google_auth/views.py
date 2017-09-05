@@ -13,8 +13,8 @@ from .models import get_users_by_email, create_user, create_google_auth_user
 authorized_domains = getattr(settings, 'GOOGLE_AUTH_AUTHORIZED_DOMAINS', ['gmail.com'])
 client_id = getattr(settings, 'GOOGLE_AUTH_CLIENT_ID', '')
 client_secret = getattr(settings, 'GOOGLE_AUTH_CLIENT_SECRET', '')
-scope = getattr(settings, 'GOOGLE_AUTH_SCOPE', 'email')
-redirect_uri = getattr(settings, 'GOOGLE_AUTH_REDIRECT_URL', 'email')
+scope = getattr(settings, 'GOOGLE_AUTH_SCOPE', 'email profile')
+redirect_uri = getattr(settings, 'GOOGLE_AUTH_REDIRECT_URL', 'localhost:8000')
 	
 flow = OAuth2WebServerFlow(client_id=client_id,
                            client_secret=client_secret,

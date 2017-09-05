@@ -71,7 +71,7 @@ After completing the above flow, to authenticate an user's request, set an Autho
 Authorization: token ya29.xxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-##### Rest Framework
+### Rest Framework
 For django rest framework, add google_auth.authentication.GoogleAuthAuthentication to REST_FRAMEWORK.DEFAULT_AUTHENTICATOR_CLASSES
 ```
     'DEFAULT_AUTHENTICATION_CLASSES': (

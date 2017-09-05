@@ -57,7 +57,7 @@ class GoogleAuthAuthentication(BaseAuthentication):
         if not google_auth_user:
             return None
         if google_auth_user.token_expiry < make_aware(datetime.now()):
-            google_auth_use = refresh_access_token(google_auth_user)
+            google_auth_user = refresh_access_token(google_auth_user)
         token = google_auth_user.access_token
         r = requests.get(token_verification_url.format(token))
         if r.status_code != 200:

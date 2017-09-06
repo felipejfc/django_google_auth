@@ -25,12 +25,7 @@ class GoogleAuthBackend(object):
     """
 
     def authenticate(self, request, token=None):
-        r = requests.get(token_verification_url.format(token))
-        if r.status_code != 200:
-            return None
-        acc_info = r.json()
-        email = acc_info.get('email','')
-        user = get_users_by_email(email)
+        user, _ = do_authentication(token)
         return user
 
     def get_user(self, user_id):
@@ -53,19 +48,22 @@ class GoogleAuthAuthentication(BaseAuthentication):
             msg = 'Invalid authorization header.'
             raise exceptions.AuthenticationFailed(msg)
         app_token = auth[1]
-        google_auth_user = get_google_auth_user_by_app_token(app_token)
-        if not google_auth_user:
-            return None
-        if google_auth_user.token_expiry < make_aware(datetime.now()):
-            google_auth_user = refresh_access_token(google_auth_user)
-        token = google_auth_user.access_token
-        r = requests.get(token_verification_url.format(token))
-        if r.status_code != 200:
-            return None
-        acc_info = r.json()
-        email = acc_info.get('email','')
-        user = get_users_by_email(email)
-        return user, token
+        return do_authentication(app_token)
+
+def do_authentication(app_token=None):
+    google_auth_user = get_google_auth_user_by_app_token(app_token)
+    if not google_auth_user:
+        return None
+    if google_auth_user.token_expiry < make_aware(datetime.now()):
+        google_auth_user = refresh_access_token(google_auth_user)
+    token = google_auth_user.access_token
+    r = requests.get(token_verification_url.format(token))
+    if r.status_code != 200:
+        return None
+    acc_info = r.json()
+    email = acc_info.get('email','')
+    user = get_users_by_email(email)
+    return user, token
 
 def refresh_access_token(google_auth_user):
     r = requests.post(refresh_token_url, data = {'client_id':client_id,

@@ -40,14 +40,7 @@ class GoogleAuthAuthentication(BaseAuthentication):
     or None otherwise.
     """
     def authenticate(self, request):
-        auth_header = get_authorization_header(request).decode(HTTP_HEADER_ENCODING)
-        auth = auth_header.split()
-        if not auth or auth[0].lower() != 'token':
-            return None
-        if len(auth)!=2:
-            msg = 'Invalid authorization header.'
-            raise exceptions.AuthenticationFailed(msg)
-        app_token = auth[1]
+        app_token = get_token_from_request_header(request)
         return do_authentication(app_token)
 
 def do_authentication(app_token=None):
@@ -56,14 +49,24 @@ def do_authentication(app_token=None):
         return None
     if google_auth_user.token_expiry < make_aware(datetime.now()):
         google_auth_user = refresh_access_token(google_auth_user)
-    token = google_auth_user.access_token
-    r = requests.get(token_verification_url.format(token))
+    r = requests.get(token_verification_url.format(google_auth_user.access_token))
     if r.status_code != 200:
         return None
     acc_info = r.json()
     email = acc_info.get('email','')
     user = get_users_by_email(email)
-    return user, token
+    return user, app_token
+
+def get_token_from_request_header(request):
+    auth_header = get_authorization_header(request).decode(HTTP_HEADER_ENCODING)
+    auth = auth_header.split()
+    if not auth or auth[0].lower() != 'token':
+        return None
+    if len(auth)!=2:
+        msg = 'Invalid authorization header.'
+        raise exceptions.AuthenticationFailed(msg)
+    app_token = auth[1]
+    return app_token
 
 def refresh_access_token(google_auth_user):
     r = requests.post(refresh_token_url, data = {'client_id':client_id,

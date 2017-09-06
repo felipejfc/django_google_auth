@@ -8,7 +8,8 @@ from django.views.generic import View
 from django.http import HttpResponse
 from oauth2client.client import OAuth2WebServerFlow
 from django.conf import settings
-from .models import get_users_by_email, create_user, create_google_auth_user
+from .models import get_users_by_email, create_user, create_google_auth_user, regenerate_app_token
+from .authentication import do_authentication, get_token_from_request_header
 
 authorized_domains = getattr(settings, 'GOOGLE_AUTH_AUTHORIZED_DOMAINS', ['gmail.com'])
 client_id = getattr(settings, 'GOOGLE_AUTH_CLIENT_ID', '')
@@ -48,5 +49,14 @@ class ExchangeCode(View):
         res = {}
         res['token'] = google_auth_user.app_token
         res['email'] = email
+        return HttpResponse(json.dumps(res))
+    head = post
+
+class RefreshAppToken(View):
+    def post(self, request):
+        current_token = get_token_from_request_header(request)
+        user, app_token = do_authentication(current_token)
+        res = {}
+        res['token'] = str(regenerate_app_token(app_token))
         return HttpResponse(json.dumps(res))
     head = post

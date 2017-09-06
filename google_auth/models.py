@@ -20,8 +20,16 @@ class GoogleAuthUser(models.Model):
     access_token = models.CharField(max_length=254,null=True)
     refresh_token = models.CharField(max_length=254,null=True)
 
+def regenerate_app_token(app_token):
+    new_token = uuid.uuid4()
+    GoogleAuthUser.objects.filter(app_token=app_token).update(app_token=new_token)
+    return new_token
+
 def get_google_auth_user_by_app_token(app_token):
     return GoogleAuthUser.objects.filter(**{"app_token": app_token}).first()
+
+def get_google_auth_user_by_email(email):
+    return GoogleAuthUser.objects.filter(**{"email__iexact": email}).first()
 
 def get_users_by_email(email):
     return User.objects.filter(**{"email__iexact": email}).first()

@@ -71,7 +71,7 @@ def refresh_access_token(google_auth_user):
         'refresh_token':google_auth_user.refresh_token,
         'grant_type':'refresh_token'})
     if r.status_code != 200:
-       raise Exception('user google auth token is expired and unnable to be refreshed')
+        raise Exception('user google auth token is expired and unnable to be refreshed')
     res = r.json()
     google_auth_user.access_token = res.get('access_token','')
     google_auth_user.token_expiry = make_aware(

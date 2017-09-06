@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-google-auth',
-    version=__import__('google-auth').__version__,
-    description=__import__('google-auth').__doc__,
+    version=__import__('google_auth').__version__,
+    description=__import__('google_auth').__doc__,
     long_description=open('README.md').read(),
     author='Felipe Cavalcanti',
     author_email='fjfcavalcanti@gmail.com',

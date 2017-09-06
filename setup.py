@@ -11,13 +11,10 @@ setup(
     license='MIT',
     packages=find_packages(),
     classifiers=[
-        "Development Status :: Beta",
         "Environment :: Web Environment",
         "Framework :: Django",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     install_requires=[
         'oauth2client>=4.1.2',

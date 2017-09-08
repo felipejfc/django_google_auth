@@ -10,6 +10,8 @@ from oauth2client.client import OAuth2WebServerFlow
 from django.conf import settings
 from .models import get_users_by_email, create_user, create_google_auth_user, regenerate_app_token
 from .authentication import do_authentication, get_token_from_request_header
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 authorized_domains = getattr(settings, 'GOOGLE_AUTH_AUTHORIZED_DOMAINS', ['gmail.com'])
 client_id = getattr(settings, 'GOOGLE_AUTH_CLIENT_ID', '')
@@ -27,11 +29,13 @@ flow = OAuth2WebServerFlow(client_id=client_id,
 class GoogleAuthCodeURL(View):
     def get(self, request):
         auth_uri = flow.step1_get_authorize_url()
-        return HttpResponse(auth_uri)
+        res = {}
+        res['codeUrl'] = auth_uri
+        return HttpResponse(json.dumps(res))
     head = get
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ExchangeCode(View):
-
     def post(self, request):
         auth_code = request.GET.get('code')
         credentials = flow.step2_exchange(auth_code)
@@ -47,8 +51,7 @@ class ExchangeCode(View):
         user, _ = create_user(name, last_name, email)
         google_auth_user, _ = create_google_auth_user(user, email, access_token, refresh_token, token_expiry)
         res = {}
-        res['token'] = google_auth_user.app_token
-        res['email'] = email
+        res['token'] = str(google_auth_user.app_token)
         return HttpResponse(json.dumps(res))
     head = post
 

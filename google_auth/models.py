@@ -35,9 +35,10 @@ def get_users_by_email(email):
     return User.objects.filter(**{"email__iexact": email}).first()
 
 def create_user(name, last_name, email):
+    username=email.split("@")[0]
     return get_user_model().objects.update_or_create(
             email=email,
-            defaults={"username": email,
+            defaults={"username": username,
                 "first_name": name,
                 "last_name": last_name})
 

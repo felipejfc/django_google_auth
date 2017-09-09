@@ -52,6 +52,7 @@ class ExchangeCode(View):
         google_auth_user, _ = create_google_auth_user(user, email, access_token, refresh_token, token_expiry)
         res = {}
         res['token'] = str(google_auth_user.app_token)
+        res['email'] = email
         return HttpResponse(json.dumps(res))
     head = post
 

@@ -26,6 +26,14 @@ flow = OAuth2WebServerFlow(client_id=client_id,
                            prompt='consent',
                            access_type='offline')
 
+def make_flow_with_redirect_uri(redirect_uri):
+    return OAuth2WebServerFlow(client_id=client_id,
+                               client_secret=client_secret,
+                               scope=scope,
+                               redirect_uri=redirect_uri,
+                               prompt='consent',
+                               access_type='offline')
+
 class GoogleAuthCodeURL(View):
     def get(self, request):
         auth_uri = flow.step1_get_authorize_url()
@@ -38,7 +46,9 @@ class GoogleAuthCodeURL(View):
 class ExchangeCode(View):
     def post(self, request):
         auth_code = request.GET.get('code')
-        credentials = flow.step2_exchange(auth_code)
+        redirect_uri = request.GET.get('redirect_uri')
+        l_flow = make_flow_with_redirect_uri(redirect_uri) if redirect_uri else flow
+        credentials = l_flow.step2_exchange(auth_code)
         email = credentials.id_token.get('email','')
         domain = email.split('@')[1]
         name = credentials.id_token.get('given_name','')
